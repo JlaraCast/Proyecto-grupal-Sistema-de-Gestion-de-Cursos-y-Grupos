@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -14,13 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        /* 
+        // Create 20 users, 20 groups, and enroll each user in a unique group
+        for ($i = 0; $i < 20; $i++) {
+            $user = User::factory()->create();
+            $grupo = Grupo::factory()->create();
+            // this method need the rest of factorys to function
+            Matricula::factory()->forUniqueCombination($user->id,$grupo->id)->create();
+        }
+        */
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-
-        //Matricula::factory()->forUniqueCombination($user->id,$grupo->id)-;
     }
 }

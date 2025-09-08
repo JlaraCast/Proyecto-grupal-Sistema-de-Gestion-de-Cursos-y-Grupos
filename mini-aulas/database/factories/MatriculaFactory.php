@@ -18,9 +18,15 @@ class MatriculaFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
-            'grupo_id' => \App\Models\Grupo::factory(),
+            
         ];
     }
-    
+    //this method garantire a unique combination
+    public function forUniqueCombination(int $userId, int $groupId): Factory
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => $userId,
+            'grupo_id' => $groupId,
+        ]);
+    }
 }
