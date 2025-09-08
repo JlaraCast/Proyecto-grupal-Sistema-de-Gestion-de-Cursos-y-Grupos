@@ -12,47 +12,42 @@ class MatriculaController extends Controller
      */
     public function index()
     {
-        //
+        return Matricula::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validated();
+        $post = Matricula::create($data);
+        return response()->json($post, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Matricula $matricula)
+    public function show($id)
     {
-        //
+        $post = Matricula::find($id);
+
+        if (!$post) {
+            return response()->json(['message' => 'La matrícula no se encontró :('], 404);
+        }
+        return response()->json($post);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Matricula $matricula)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Matricula $matricula)
     {
-        //
+        $data = $request->validated();
+        $matricula->update($data);
+        return response()->json($matricula);
     }
 
     /**
@@ -60,6 +55,6 @@ class MatriculaController extends Controller
      */
     public function destroy(Matricula $matricula)
     {
-        //
+        
     }
 }
