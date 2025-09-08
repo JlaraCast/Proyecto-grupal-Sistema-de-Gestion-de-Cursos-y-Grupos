@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol',
     ];
 
     /**
@@ -43,5 +44,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    public function gruposImpartidos()
+    {
+        return $this->hasMany(Grupo::class, 'profesor_id');
+    }
+
+    public function matriculas()
+    {
+        return $this->belongsToMany(Grupo::class, 'matriculas')
+                    ->withTimestamps();
+    }
+
+    public function isAdmin()
+    {
+        return $this->rol === 'admin';
+    }
+
+    public function isProfesor()
+    {
+        return $this->rol === 'profesor';
+    }
+
+    public function isEstudiante()
+    {
+        return $this->rol === 'estudiante';
     }
 }

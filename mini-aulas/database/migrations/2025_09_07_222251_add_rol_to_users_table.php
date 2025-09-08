@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cursos', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('codigo')->unique();
-            $table->text('descripcion')->nullable();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('rol', ['admin', 'profesor', 'estudiante'])->default('estudiante');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cursos');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('rol');
+        });
     }
 };
