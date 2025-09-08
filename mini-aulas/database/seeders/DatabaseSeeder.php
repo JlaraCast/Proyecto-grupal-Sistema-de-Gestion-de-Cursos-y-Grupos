@@ -7,6 +7,7 @@ use App\Models\Curso;
 use App\Models\Grupo;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,16 +22,19 @@ class DatabaseSeeder extends Seeder
         User::factory()->admin()->create([
             'name' => 'Administrador',
             'email' => 'admin@example.com',
+            'password' => Hash::make('admin1234'),
         ]);
 
         User::factory()->profesor()->create([
             'name' => 'Profesor Ejemplo',
             'email' => 'profesor@example.com',
+            'password' => bcrypt('profesor1234'),
         ]);
 
         User::factory()->estudiante()->create([
             'name' => 'Estudiante Ejemplo',
             'email' => 'estudiante@example.com',
+            'password' => bcrypt('estudiante1234'),
         ]);
 
         // Crear más usuarios
