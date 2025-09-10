@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\AuthRequests\LoginRequest;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -27,13 +28,23 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        try {
+            $credentials = $request->only('email', 'password');
 
-        if (! $token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => 'Credenciales inválidas'
+                ], 401);
+            }
+
+            $user = Auth::user();
+
+            return $this->respondWithToken($token, $user);
+            
+        } catch (Exception $e) {
+            return response()->json(['error' => 'No se pudo iniciar sesión'], 500);
         }
-
-        return $this->respondWithToken($token);
     }
 
     /**
@@ -43,13 +54,19 @@ class AuthController extends Controller
      */
     public function me()
     {
-        $user = JWTAuth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado o token expirado'], 404);
-        }
-        return response()->json($user);
-    }
+        try {
+            $user = JWTAuth::user();
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no encontrado'], 404);
+            }
+            $user->role_name = ucfirst($user->roles()->first()->name);
+            unset($user->roles);
 
+            return response()->json($user);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error al obtener el usuario'], 500);
+        }
+    }
     /**
      * Log the user out (Invalidate the token).
      *
@@ -57,11 +74,15 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+        } catch (Exception $e) {
+            return response()->json(['error' => 'no se pudo cerrar sesión'], 500);
+        }
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Sesión cerrada con éxito']);
     }
-    
+
     /**
      * Get the token array structure.
      *
