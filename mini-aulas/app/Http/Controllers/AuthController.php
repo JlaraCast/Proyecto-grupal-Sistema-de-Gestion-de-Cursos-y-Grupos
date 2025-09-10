@@ -18,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+     //   $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -28,23 +28,18 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        try {
-            $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password');
 
             if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'error' => 'Unauthorized',
-                    'message' => 'Credenciales inválidas'
+                    'message' => 'Credenciales invalidas'
                 ], 401);
             }
 
             $user = Auth::user();
 
             return $this->respondWithToken($token, $user);
-            
-        } catch (Exception $e) {
-            return response()->json(['error' => 'No se pudo iniciar sesión'], 500);
-        }
     }
 
     /**
@@ -54,18 +49,14 @@ class AuthController extends Controller
      */
     public function me()
     {
-        try {
-            $user = JWTAuth::user();
-            if (!$user) {
-                return response()->json(['message' => 'Usuario no encontrado'], 404);
-            }
-            $user->role_name = ucfirst($user->roles()->first()->name);
+        $user = JWTAuth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+        $user->role_name = ucfirst($user->roles()->first()->name);
             unset($user->roles);
 
             return response()->json($user);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Error al obtener el usuario'], 500);
-        }
     }
     /**
      * Log the user out (Invalidate the token).
@@ -74,13 +65,12 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        try {
+        if($user = JWTAuth::user()) {
             JWTAuth::invalidate(JWTAuth::getToken());
-        } catch (Exception $e) {
-            return response()->json(['error' => 'no se pudo cerrar sesión'], 500);
+            return response()->json(['message' => 'Sesión cerrada con éxito']);
         }
+        return response()->json(['message' => 'No hay usuario autenticado'], 401);
 
-        return response()->json(['message' => 'Sesión cerrada con éxito']);
     }
 
     /**
