@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('grupos', function (Blueprint $table) {
             $table->id();
+            $table->integer('numero_grupo');
+            $table->integer('cupo_maximo');
+            $table->foreignId('curso_id')->constrained()->onDelete('cascade');
+            $table->foreignId('profesor_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
+
+            $table->unique(['curso_id', 'numero_grupo']);
         });
     }
 
