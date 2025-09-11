@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Grupo;
 use Illuminate\Http\Request;
+use Exception;
+use App\Services\GrupoService;
+use App\Http\Requests\GrupoRequests\StoreGrupoRequest;
+use App\Http\Requests\GrupoRequests\UpdateGrupoRequest;
 
 class GrupoController extends Controller
 {
@@ -12,54 +16,61 @@ class GrupoController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        try {
+            $grupos = Grupo::all();
+            return response()->json($grupos, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al recuperar los grupos.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreGrupoRequest $request, GrupoService $grupoService)
     {
-        //
+        try {
+            $validatedData = $request->validated();
+            $grupo = $grupoService->crearGrupo($validatedData);
+            return response()->json($grupo, 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al crear el grupo.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Grupo $grupo)
+    public function show(string $id, GrupoService $grupoService)
     {
-        //
+        $response = $grupoService->getGrupoById($id);
+        return response()->json($response, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Grupo $grupo)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Grupo $grupo)
+    public function update(UpdateGrupoRequest $request,String $id, GrupoService $grupoService)
     {
-        //
+        $response = $grupoService->actualizarGrupo($id, $request->validated());
+        return response()->json($response, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Grupo $grupo)
+    public function destroy(String $id, GrupoService $grupoService)
     {
-        //
+        if(Grupo::find($id)){
+            $response = $grupoService->eliminarGrupo($id);
+            return response()->json($response, 200);
+        }
     }
 }
