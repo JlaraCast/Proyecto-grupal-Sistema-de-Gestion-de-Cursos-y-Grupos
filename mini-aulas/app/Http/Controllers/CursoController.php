@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CursoRequests\UpdateCursoRequest;
 use App\Models\Curso;
 use Illuminate\Http\Request;
+use Exception;
+use App\Http\Requests\CursoRequests\StoreCursoRequest;
+use App\Services\CursoService;
 
 class CursoController extends Controller
 {
@@ -12,54 +16,61 @@ class CursoController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        try {
+            $cursos = Curso::all();
+            return response()->json($cursos, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al recuperar los cursos.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCursoRequest $request, CursoService $cursoService)
     {
-        //
+        try {
+            $validatedData = $request->validated();
+            $curso = $cursoService->crearCurso($validatedData);
+            return response()->json($curso, 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al crear el curso.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Curso $curso)
+    public function show(string $id, CursoService $cursoService)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Curso $curso)
-    {
-        //
+        $response = $cursoService->getCursoById($id);
+        return response()->json($response, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Curso $curso)
+    public function update(UpdateCursoRequest $request,String $id, CursoService $cursoService)
     {
-        //
+        $response = $cursoService->actualizarCurso($id, $request->validated());
+        return response()->json($response, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Curso $curso)
+    public function destroy(String $id, CursoService $cursoService)
     {
-        //
+        if(Curso::find($id)){
+            $response = $cursoService->eliminarCurso($id);
+            return response()->json($response, 200);
+        }
     }
 }
+

@@ -37,7 +37,7 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            $user = Auth::user();
+            $user = JWTAuth::user();
 
             return $this->respondWithToken($token, $user);
     }

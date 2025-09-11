@@ -114,14 +114,14 @@ class DatabaseSeeder extends Seeder
         }
 
         // Crear cursos
-        Curso::factory(10)->create();
+        Curso::factory(5)->create();
 
-        // Para cada curso creado, crear 3 grupos
+        // Para cada curso creado, crear 2 grupos
         Curso::all()->each(function ($curso) {
             $profesor = User::role('profesor')->inRandomOrder()->first();
 
             if ($profesor) {
-                Grupo::factory(3)->create([
+                Grupo::factory(2)->create([
                     'curso_id' => $curso->id,
                     'profesor_id' => $profesor->id,
                 ]);
