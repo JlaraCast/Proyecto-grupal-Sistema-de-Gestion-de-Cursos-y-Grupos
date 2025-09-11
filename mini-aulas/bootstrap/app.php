@@ -11,8 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
-        //
+    ->withMiddleware(function () {
+        
+        return [
+        \Illuminate\Http\Middleware\TrustProxies::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
+        //\Illuminate\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        //\App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, // ← importante
+    ];
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
