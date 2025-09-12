@@ -4,62 +4,88 @@ namespace App\Http\Controllers;
 
 use App\Models\Grupo;
 use Illuminate\Http\Request;
+use Exception;
+use App\Services\GrupoService;
+use App\Http\Requests\GrupoRequests\StoreGrupoRequest;
+use App\Http\Requests\GrupoRequests\UpdateGrupoRequest;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class GrupoController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        try {
+            $grupos = Grupo::all();
+            return response()->json($grupos, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al recuperar los grupos.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreGrupoRequest $request, GrupoService $grupoService)
     {
-        //
+        try {
+            if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
+            $validatedData = $request->validated();
+            $grupo = $grupoService->crearGrupo($validatedData);
+            return response()->json($grupo, 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'mensaje' => 'Hubo un error al crear el grupo.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Grupo $grupo)
+    public function show(String $grupo, GrupoService $grupoService)
     {
-        //
+        $response = $grupoService->getGrupoById($grupo);
+        return response()->json($response, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Grupo $grupo)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Grupo $grupo)
+    public function update(UpdateGrupoRequest $request, GrupoService $grupoService, string $id)
     {
-        //
+        $grupo = Grupo::find($id);
+        if (JWTAuth::user()->hasRole('profesor') && $grupo->profesor_id !== JWTAuth::User()->id) {
+            return response()->json(['message' => 'Solo puedes editar tus grupos'], 403);
+        }
+
+        if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+        $response = $grupoService->actualizarGrupo($id, $request->validated());
+        return response()->json($response, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Grupo $grupo)
+    public function destroy(String $id, GrupoService $grupoService)
     {
-        //
+        if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+        $response = $grupoService->eliminarGrupo($id);
+        return response()->json($response, 200);
     }
 }
