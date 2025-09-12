@@ -8,9 +8,11 @@ use Exception;
 use App\Services\GrupoService;
 use App\Http\Requests\GrupoRequests\StoreGrupoRequest;
 use App\Http\Requests\GrupoRequests\UpdateGrupoRequest;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class GrupoController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -33,6 +35,10 @@ class GrupoController extends Controller
     public function store(StoreGrupoRequest $request, GrupoService $grupoService)
     {
         try {
+            if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $validatedData = $request->validated();
             $grupo = $grupoService->crearGrupo($validatedData);
             return response()->json($grupo, 201);
@@ -47,9 +53,9 @@ class GrupoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id, GrupoService $grupoService)
+    public function show(String $grupo, GrupoService $grupoService)
     {
-        $response = $grupoService->getGrupoById($id);
+        $response = $grupoService->getGrupoById($grupo);
         return response()->json($response, 200);
     }
 
@@ -57,8 +63,16 @@ class GrupoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateGrupoRequest $request,String $id, GrupoService $grupoService)
+    public function update(UpdateGrupoRequest $request, GrupoService $grupoService, string $id)
     {
+        $grupo = Grupo::find($id);
+        if (JWTAuth::user()->hasRole('profesor') && $grupo->profesor_id !== JWTAuth::User()->id) {
+            return response()->json(['message' => 'Solo puedes editar tus grupos'], 403);
+        }
+
+        if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
         $response = $grupoService->actualizarGrupo($id, $request->validated());
         return response()->json($response, 200);
     }
@@ -68,9 +82,10 @@ class GrupoController extends Controller
      */
     public function destroy(String $id, GrupoService $grupoService)
     {
-        if(Grupo::find($id)){
-            $response = $grupoService->eliminarGrupo($id);
-            return response()->json($response, 200);
+        if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
+        $response = $grupoService->eliminarGrupo($id);
+        return response()->json($response, 200);
     }
 }

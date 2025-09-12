@@ -6,6 +6,7 @@ use App\Models\Grupo;
 
 class GrupoService
 {
+
     // Lógica del servicio para manejar grupos
 
     public function crearGrupo(array $data)
@@ -13,7 +14,7 @@ class GrupoService
         return Grupo::create($data);
     }
 
-    public function getGrupoById(string $id): array
+    public function getGrupoById(String $id): array
     {
         $grupo = Grupo::find($id);
 
