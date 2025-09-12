@@ -22,7 +22,6 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'rol',
         'profile_image',
     ];
 
@@ -70,18 +69,4 @@ class User extends Authenticatable implements JWTSubject
                     ->withTimestamps();
     }
 
-    public function isAdmin()
-    {
-        return $this->rol === 'admin';
-    }
-
-    public function isProfesor()
-    {
-        return $this->rol === 'profesor';
-    }
-
-    public function isEstudiante()
-    {
-        return $this->rol === 'estudiante';
-    }
 }

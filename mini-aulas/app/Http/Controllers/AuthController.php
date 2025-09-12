@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\AuthRequests\LoginRequest;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -17,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+     //   $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -29,11 +30,16 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (! $token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => 'Credenciales invalidas'
+                ], 401);
+            }
 
-        return $this->respondWithToken($token);
+            $user = Auth::user();
+
+            return $this->respondWithToken($token, $user);
     }
 
     /**
@@ -45,11 +51,13 @@ class AuthController extends Controller
     {
         $user = JWTAuth::user();
         if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado o token expirado'], 404);
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
-        return response()->json($user);
-    }
+        $user->role_name = ucfirst($user->roles()->first()->name);
+            unset($user->roles);
 
+            return response()->json($user);
+    }
     /**
      * Log the user out (Invalidate the token).
      *
@@ -57,11 +65,14 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        if($user = JWTAuth::user()) {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Sesión cerrada con éxito']);
+        }
+        return response()->json(['message' => 'No hay usuario autenticado'], 401);
 
-        return response()->json(['message' => 'Successfully logged out']);
     }
-    
+
     /**
      * Get the token array structure.
      *

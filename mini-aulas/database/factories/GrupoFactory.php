@@ -22,7 +22,7 @@ class GrupoFactory extends Factory
             'numero_grupo' => fake()->numberBetween(1, 10),
             'cupo_maximo' => fake()->numberBetween(20, 40),
             'curso_id' => Curso::factory(),
-            'profesor_id' => User::factory()->profesor(),
+            'profesor_id' => User::factory(),
         ];
     }
 }
