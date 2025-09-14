@@ -17,8 +17,15 @@ Route::post('/logout', [AuthController::class, 'logout']);
 //rutas protegidas
     Route::apiResource('cursos', CursoController::class);
     Route::apiResource('grupos', GrupoController::class);
+    //Route::apiResource('users', UserController::class);
 
-//users
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+
+
+//ruta protegida solo para admin
+// API con JWT:
+Route::middleware(['auth:api', 'role:admin'])->group(function () {
     Route::apiResource('users', UserController::class);
 });
+
+
+
