@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Exception;
 use App\Http\Requests\CursoRequests\StoreCursoRequest;
 use App\Services\CursoService;
+use Namshi\JOSE\JWT;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class CursoController extends Controller
 {
@@ -19,6 +21,7 @@ class CursoController extends Controller
         try {
             $cursos = Curso::all();
             return response()->json($cursos, 200);
+            
         } catch (Exception $e) {
             return response()->json([
                 'mensaje' => 'Hubo un error al recuperar los cursos.',
@@ -33,9 +36,14 @@ class CursoController extends Controller
     public function store(StoreCursoRequest $request, CursoService $cursoService)
     {
         try {
+            if (!JWTAuth::user()->hasRole('admin')) {
+                return response()->json(['message' => 'No autorizado'], 403);
+            }
+
             $validatedData = $request->validated();
             $curso = $cursoService->crearCurso($validatedData);
             return response()->json($curso, 201);
+
         } catch (Exception $e) {
             return response()->json([
                 'mensaje' => 'Hubo un error al crear el curso.',
@@ -56,8 +64,11 @@ class CursoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCursoRequest $request,String $id, CursoService $cursoService)
+    public function update(UpdateCursoRequest $request, String $id, CursoService $cursoService)
     {
+        if (!JWTAuth::user()->hasRole('admin')) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
         $response = $cursoService->actualizarCurso($id, $request->validated());
         return response()->json($response, 200);
     }
@@ -67,10 +78,10 @@ class CursoController extends Controller
      */
     public function destroy(String $id, CursoService $cursoService)
     {
-        if(Curso::find($id)){
-            $response = $cursoService->eliminarCurso($id);
-            return response()->json($response, 200);
+        if (!JWTAuth::user()->hasRole('admin')) {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
+        $response = $cursoService->eliminarCurso($id);
+        return response()->json($response, 200);
     }
 }
-

@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Grupo;
+use App\Models\Matricula;
 use App\Models\User;
 use App\Models\Curso;
-use App\Models\Grupo;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -113,7 +114,8 @@ class DatabaseSeeder extends Seeder
             $studentUser->assignRole('estudiante');
         }
 
-        // Crear cursos
+            // Para cada curso creado, crear 2 grupos
+            // Crear cursos
         Curso::factory(5)->create();
 
         // Para cada curso creado, crear 2 grupos
@@ -127,5 +129,21 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         });
+    
+
+        // gets all students and groups
+        $estudiantes = User::role('estudiante')->get();
+        $grupos = Grupo::all();
+
+        // it make one enrollment for each student
+        foreach ($estudiantes as $estudiante) {
+            // it gets a random group
+            $grupo = $grupos->random();
+            // avoid duplicate enrollments
+            Matricula::firstOrCreate([
+                'user_id' => $estudiante->id,
+                'grupo_id' => $grupo->id,
+            ]);
+        }
     }
 }

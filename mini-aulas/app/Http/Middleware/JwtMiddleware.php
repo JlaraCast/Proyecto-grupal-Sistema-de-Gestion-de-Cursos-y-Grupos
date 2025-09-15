@@ -16,7 +16,6 @@ class JwtMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-
             // Tries to authenticate the user using the token
             if (!$user) {
                 return response()->json(['message' => 'Usuario no encontrado.'], 404);
