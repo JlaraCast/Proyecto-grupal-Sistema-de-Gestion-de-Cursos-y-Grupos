@@ -31,4 +31,6 @@ Route::middleware([JwtMiddleware::class])->group(function () {
     Route::put('grupos/{id}', [GrupoController::class, 'update']); // Admin + profesor
     Route::delete('grupos/{id}', [GrupoController::class, 'destroy']); // Solo admin
 
+    // MATRICULAS
+    Route::apiResource('matriculas', MatriculaController::class);
 });

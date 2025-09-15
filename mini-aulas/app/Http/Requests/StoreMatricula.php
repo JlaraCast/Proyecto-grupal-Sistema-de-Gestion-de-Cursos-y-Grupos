@@ -22,7 +22,6 @@ class StoreMatricula extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
             'grupo_id' => 'required|exists:grupos,id',
         ];
     }
@@ -30,15 +29,12 @@ class StoreMatricula extends FormRequest
     public function attributes()
     {
         return [
-            'user_id' => 'ID de usuario',
             'grupo_id' => 'ID de grupo',
         ];
     }
     public function messages()
     {
         return [
-            'user_id.required' => 'El campo :attribute es obligatorio.',
-            'user_id.exists' => 'El :attribute proporcionado no existe.',
             'grupo_id.required' => 'El campo :attribute es obligatorio.',
             'grupo_id.exists' => 'El :attribute proporcionado no existe.',
         ];
