@@ -23,7 +23,7 @@ class MatriculaController extends Controller
      */
     public function store(StoreMatricula $request)
     {
-        
+
         $userId = JWTAuth::user()->id;
 
         $data = $request->validated();
@@ -66,33 +66,13 @@ class MatriculaController extends Controller
         return response()->json($post);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
-
-    //this method is only made for fun and practice
-    public function update(Request $request, Matricula $matricula)
-    {
-        $data = $request->validated();
-        
-        if (!JWTAuth::user()->hasAnyRole('estudiante')) {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-        // Check if the authenticated user is the owner of the enrollment
-        if (JWTAuth::user()->hasRole('estudiante') && $matricula->user_id !== JWTAuth::user()->id) {
-            return response()->json(['message' => 'Solo puedes editar tus propias matriculas'], 403);
-        }
-        $matricula->update($data);
-        return response()->json($matricula);
-    }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         $matricula = Matricula::find($id);
-        
+
          // Only students can delete their own enrollments
         if (!JWTAuth::user()->hasAnyRole('estudiante')) {
             return response()->json(['message' => 'No autorizado'], 403);

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+
     /**
      * Run the migrations.
      */
@@ -17,6 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('profile_image')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -39,6 +41,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     * cuando quiera hacer rollback de la migraciones
+     * se eliminan las tablas creadas
      */
     public function down(): void
     {

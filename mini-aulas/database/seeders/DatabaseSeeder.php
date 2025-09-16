@@ -77,13 +77,13 @@ class DatabaseSeeder extends Seeder
             'unenroll_group',
         ]);
 
-        // Asignar roles a los usuarios de test
-
+        //Asignar roles a los usuarios de test
         $adminUser = User::factory()->create([
             'name' => 'Administrador',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
         ]);
+
         $adminUser->assignRole('admin');
 
         $professorUser = User::factory()->create([
@@ -123,13 +123,13 @@ class DatabaseSeeder extends Seeder
             $profesor = User::role('profesor')->inRandomOrder()->first();
 
             if ($profesor) {
-                Grupo::factory(2)->create([
+                Grupo::factory(1)->create([
                     'curso_id' => $curso->id,
                     'profesor_id' => $profesor->id,
                 ]);
             }
         });
-    
+
 
         // gets all students and groups
         $estudiantes = User::role('estudiante')->get();

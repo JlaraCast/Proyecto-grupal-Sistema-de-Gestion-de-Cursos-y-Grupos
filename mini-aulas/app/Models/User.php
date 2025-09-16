@@ -12,7 +12,6 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, HasRoles;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -40,6 +39,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array<string, string>
      */
+    
+    //indica que el campo email_verified_at es un campo de tipo fecha y hora
+    //y que el campo password debe ser hasheado automaticamente
     protected function casts(): array
     {
         return [
@@ -48,6 +50,7 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    //aqui van los metodos de JWTSubject
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -58,11 +61,15 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    //aqui van las relaciones Eloquent
+    //Un usuario puede impartir muchos grupos (si es profesor)
     public function gruposImpartidos()
     {
         return $this->hasMany(Grupo::class, 'profesor_id');
     }
 
+    // Un usuario puede estar en muchos grupos, y un grupo puede tener muchos usuarios.
+    //Esa relación se guarda en la tabla intermedia matriculas.
     public function matriculas()
     {
         return $this->belongsToMany(Grupo::class, 'matriculas')
