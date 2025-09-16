@@ -82,6 +82,12 @@ class GrupoController extends Controller
      */
     public function destroy(String $id, GrupoService $grupoService)
     {
+
+        $grupo = Grupo::find($id);
+        if (JWTAuth::user()->hasRole('profesor') && $grupo->profesor_id !== JWTAuth::User()->id) {
+            return response()->json(['message' => 'Solo puedes editar tus grupos'], 403);
+        }
+
         if (!JWTAuth::user()->hasAnyRole(['admin', 'profesor'])) {
             return response()->json(['message' => 'No autorizado'], 403);
         }

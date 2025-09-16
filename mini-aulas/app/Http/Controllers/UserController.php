@@ -17,9 +17,9 @@ class UserController extends Controller
     {
         $users = User::all();
         return response()->json([
-        'mensaje' => 'Lista de usuarios obtenida correctamente',
-        'data'    => $users,
-    ], 200);
+            'mensaje' => 'Lista de usuarios obtenida correctamente',
+            'data'    => $users,
+        ], 200);
     }
 
     /**
@@ -28,15 +28,15 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         //método para crear usuarios
-       $data =$request ->validated(); //validaciones se hacen en StoreUserRequest
-       unset($data['id']); //para evitar que se asigne un id manualmente
-       //hashear la contraseña antes de guardarla
-       $data['password'] = bcrypt($data['password']);
+        $data = $request->validated(); //validaciones se hacen en StoreUserRequest
+        unset($data['id']); //para evitar que se asigne un id manualmente
+        //hashear la contraseña antes de guardarla
+        $data['password'] = bcrypt($data['password']);
 
-       return response()->json([
-        'mensaje' => 'Usuario creado exitosamente!!', 
-        'user' => User::create($data)
-       ], 201);
+        return response()->json([
+            'mensaje' => 'Usuario creado exitosamente!!',
+            'user' => User::create($data)
+        ], 201);
     }
 
 
@@ -63,7 +63,7 @@ class UserController extends Controller
         return response()->json([
             'mensaje' => 'Usuario actualizado exitosamente!!',
             'user' => $user
-        ], 200);    
+        ], 200);
     }
 
     /**
@@ -71,14 +71,12 @@ class UserController extends Controller
      */
     public function destroy($id_user)
     {
-        $id_user= User::find($id_user);
+        $id_user = User::find($id_user);
         if (!$id_user) {
             return response()->json(['message' => 'El usuario no se encontró :('], 404);
-        }
-        else {
+        } else {
             $id_user->delete();
             return response()->json(['message' => 'Usuario eliminado exitosamente!!'], 200);
         }
     }
-
 }

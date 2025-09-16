@@ -12,14 +12,15 @@ use App\Http\Controllers\UserController;
 // Rutas públicas
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/me', [AuthController::class, 'me']);
+
 //ruta protegida solo para admin
 // API con JWT:
 Route::middleware(['auth:api', 'role:admin'])->group(function () {
     Route::apiResource('users', UserController::class);
 });
+
 // Rutas protegidas
 Route::middleware([JwtMiddleware::class])->group(function () {
-
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
