@@ -24,11 +24,22 @@ class MatriculaController extends Controller
     public function store(StoreMatricula $request)
     {
 
-        $userId = JWTAuth::user()->id;
+
+        // Only students and admins can create enrollments
+        if (!JWTAuth::user()->hasAnyRole('estudiante', 'admin')) {
+            return response()->json(['message' => 'No autorizado'], 403);
+        }
+        //verifies if user is student and change user id by her own id
+        if (JWTAuth::user()->hasAnyRole('estudiante')) {
+            $userId = JWTAuth::user()->id;
+            $data['user_id'] = $userId;
+        }
 
         $data = $request->validated();
-
-        $data['user_id'] = $userId;
+        //validate if user_id exits in data array
+        if (!isset($data['user_id'])) {
+            return response()->json(['message' => 'El campo user_id es obligatorio.'], 400);
+        }
 
         $group = Grupo::find($data['grupo_id']);
 
@@ -73,8 +84,8 @@ class MatriculaController extends Controller
     {
         $matricula = Matricula::find($id);
 
-         // Only students can delete their own enrollments
-        if (!JWTAuth::user()->hasAnyRole('estudiante')) {
+        // Only students can delete their own enrollments
+        if (!JWTAuth::user()->hasAnyRole('estudiante', 'admin')) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
         // Check if the enrollment exists
