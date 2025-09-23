@@ -21,6 +21,7 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
+    //Aqui se definen los estados por defecto y los estados personalizados para los roles
     public function definition(): array
     {
         return [
@@ -35,10 +36,12 @@ class UserFactory extends Factory
     /**
      * Indicate that the model's email address should be unverified.
      */
+    //Aqui se definen los estados personalizados para los roles
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
+
 }
