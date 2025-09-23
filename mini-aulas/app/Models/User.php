@@ -8,10 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, HasRoles;
+
+    protected $guard_name = 'api'; // especifica el guard para Spatie, sirve para evitar errores de permisos con JWT en el middleware y en los requests
+
     /**
      * The attributes that are mass assignable.
      *
@@ -75,5 +79,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Grupo::class, 'matriculas')
                     ->withTimestamps();
     }
+
+
+    //un usuario solo puede tener una imagen de perfil
+    
 
 }
